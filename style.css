@@ -1,0 +1,78 @@
+table {
+    border: 1px solid black;
+    background-color: #5A9E9C;
+}
+td {
+    padding: 1px;
+}
+#project {
+    background-color: white;
+}
+#outputValue {
+    font-size: 12px;
+    background-color: white;
+}
+#keys-table{
+    font-size: 14px;
+}
+.slidecontainer {
+    width: 100%;
+}
+
+.slider {
+    -webkit-appearance: none;
+    border-radius: 5px;
+    width: 100%;
+    height: 7px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; 
+    background: #487B7C;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; 
+    background: #487B7C;
+    cursor: pointer;
+}
+
+#colorChange {
+    text-align: right;
+}
+
+#directional{
+    display: none;
+}
+
+#point-spot{
+    display: none;
+}
+
+#specularShine{
+    display: none;
+}
+
+#ambientSpan{
+    display: none;
+}
+
+#hemisphericSpan{
+    display: none;
+}

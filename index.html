@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" href="favicon.ico" />
+        <title>Cat Wall Watch</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script type="text/javascript" src="utils/webgl-obj-loader.min.js"></script>
+        <script type="text/javascript" src="utils/utils.js"></script>
+        <script type="text/javascript" src="model/Pieces/flat.js"></script>
+        <script type="text/javascript" src="shaders/shaders.js"></script>
+        <script type="text/javascript" src="main.js"></script>
+
+    </head>
+
+
+    <body style="background-color: lightgrey;font-family:georgia,garamond,serif;font-size:13px;color: #2B2B2B;" onLoad="init();">
+        <table><tr><td>
+            <canvas id="c" width='800' height='800' style="background-color: white;">
+                Your browser doesn't support the Canvas Element!
+            </canvas>
+            </td><td>
+            <center><h1><span id="project">Cat Wall Watch</span></h1></center>
+
+            <center>
+                Color:
+                <button onclick="setRed()" style="background-color: #844848; color: white;">Red</button> <button onclick="setBlue()" style="background-color: #487b84; color: white;">Blue</button> <button onclick="setGreen()" style="background-color: #5a8448; color: white;">Green</button> <button onclick="setViolet()" style="background-color: #844861; color: white;">Violet</button> <button onclick="setDefault()" style="background-color: black; color: white;">Default</button><input type="checkbox" id="nmap" onclick="normalMapFunc()"> 
+                <label for="nmap">Normal map</label>
+                <script>
+                    function normalMapFunc() {
+                        var checkBox = document.getElementById("nmap");
+                        if (checkBox.checked == true){
+                            nmBoolean = 1.0;
+                            window.cancelAnimationFrame(reqId);
+                            window.onload = init();
+                        } else {
+                            nmBoolean = 0.0;
+                            window.cancelAnimationFrame(reqId);
+                            window.onload = init();
+                        }
+                    }
+                </script>
+
+                <script>
+                    function setDefault(){
+                        textureColor = valCol("0f0f0f");
+                        currentTextureGlobal = 'model/textures/black.png';
+
+                        window.cancelAnimationFrame(reqId);
+                        window.onload = init();
+                    }
+                    function setRed(){
+                        textureColor = valCol("844848");
+                        currentTextureGlobal = 'model/textures/red.png';
+                        window.cancelAnimationFrame(reqId);
+                        window.onload = init();
+                    }
+                    function setBlue(){
+                        textureColor = valCol("487b84");
+                        currentTextureGlobal = 'model/textures/blue.png';
+                        window.cancelAnimationFrame(reqId);
+                        window.onload = init();
+                    }
+                    function setGreen(){
+                        textureColor = valCol("5a8448");
+                        currentTextureGlobal = 'model/textures/green.png';
+                        window.cancelAnimationFrame(reqId);
+                        window.onload = init();
+                    }
+                    function setViolet(){
+                        textureColor = valCol("844861");
+                        currentTextureGlobal = 'model/textures/violet.png';
+                        window.cancelAnimationFrame(reqId);
+                        window.onload = init();
+                    }
+                </script>
+            </center><br>
+            <center>
+                <table>
+                    <tr>
+                        <td>Type
+                        </td>
+                        <td>Ambient
+                        </td>
+                        <td>Diffuse
+                        </td>
+                        <td>Specular
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <select id="lightType" onchange="changeLight(this.value);">
+                            <option value="none1">None</option>
+                            <option value="direct">Direct</option>
+                            <option value="point">Point</option>
+                            <option value="spot">Spot</option>
+                            </select>
+                        </td>
+                        <td><select id="ambient" onchange="changeLight(this.value);">
+                            <option value="none2">None</option>
+                            <option value="ambient">Ambient</option>
+                            <option value="hemispheric">Hemispheric</option>
+                            </select>
+                        </td>
+                        <td><select id="specular" onchange="changeLight(this.value);">
+                            <option value="none3">None</option>
+                            <option value="lambert">Lambert</option>
+                            <option value="toonDiff">Toon</option>
+                            <option value="orenNayar">Oren-Nayar</option>
+                            </select>
+                        </td>
+                        <td><select id="specular" onchange="changeLight(this.value);">
+                            <option value="none4">None</option>
+                            <option value="phong">Phong</option>
+                            <option value="blinn">Blinn</option>
+                            <option value="toonPhong">Toon(Phong)</option>
+                            <option value="toonBlinn">Toon(Blinn)</option>
+                            <option value="cookTorrance">Cook-Torrance</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <script>
+                    function changeLight(value){
+                        switch(value){
+                            case "none1":
+                                typeNumber = 0;
+                                document.getElementById("point-spot").style.display = "none";
+                                document.getElementById("directional").style.display = "none";
+                                break;
+                            case "direct":
+                                typeNumber = 1;
+                                document.getElementById("point-spot").style.display = "none";
+                                document.getElementById("directional").style.display = "initial";
+                                break;
+                            case "point":
+                                typeNumber = 2;
+                                document.getElementById("point-spot").style.display = "initial";
+                                document.getElementById("directional").style.display = "none";
+                                break;
+                            case "spot":
+                                typeNumber = 3;
+                                document.getElementById("point-spot").style.display = "initial";
+                                document.getElementById("directional").style.display = "none";
+                                break;
+                            case "none2":
+                                document.getElementById("ambientSpan").style.display = "none";
+                                document.getElementById("hemisphericSpan").style.display = "none";
+                                ambientNumber = 0;
+                                break;
+                            case "ambient":
+                                document.getElementById("ambientSpan").style.display = "initial";
+                                document.getElementById("hemisphericSpan").style.display = "none";
+                                ambientNumber = 1;
+                                ambientNumberH = 3;
+                                ambientNumberT = 5;
+                                break;
+                            case "hemispheric":
+                                document.getElementById("ambientSpan").style.display = "none";
+                                document.getElementById("hemisphericSpan").style.display = "initial";
+                                ambientNumber = 2;
+                                ambientNumberH = 4;
+                                ambientNumberT = 6;
+                                break;
+                            case "none3":
+                                diffuseNumber = 0;
+                                diffuseNumberH = 4;
+                                diffuseNumberT = 5;
+                                break;
+                            case "lambert":
+                                diffuseNumber = 1;
+                                diffuseNumberH = 6;
+                                diffuseNumberT = 7;
+                                break;
+                            case "toonDiff":
+                                diffuseNumber = 2;
+                                diffuseNumberH = 8;
+                                diffuseNumberT = 9;
+                                break;
+                            case "orenNayar":
+                                diffuseNumber = 3;
+                                diffuseNumberH = 10;
+                                diffuseNumberT = 11;
+                                break;
+                            case "none4":
+                                document.getElementById("specularShine").style.display = "none";
+                                specularNumber = 0;
+                                break;
+                            case "phong":
+                                document.getElementById("specularShine").style.display = "initial";
+                                specularNumber = 1;
+                                break;
+                            case "blinn":
+                                document.getElementById("specularShine").style.display = "initial";
+                                specularNumber = 2;
+                                break;
+                            case "toonPhong":
+                                document.getElementById("specularShine").style.display = "none";
+                                specularNumber = 3;
+                                break;
+                            case "toonBlinn":
+                                document.getElementById("specularShine").style.display = "none";
+                                specularNumber = 4;
+                                break;
+                            case "cookTorrance":
+                                document.getElementById("specularShine").style.display = "initial";
+                                specularNumber = 5;
+                                break;
+                            default:
+                                specularNumber = 0;
+                                break;
+                        }
+                        window.cancelAnimationFrame(reqId);
+                        window.onload = init();
+                    }
+                </script>
+            </center>
+            <br>
+
+            <div class="slidecontainer">
+                <input type="range" min="0.1" max="5" step="0.1" value="0.8" class="slider" id="fovSlider">
+                <span id="outputValue">Fov: <span id="fovOutput"></span></span>
+            </div>
+            <span id="directional">
+                <div class="slidecontainer">
+                    <input type="range" min="-180.0" max="0.0" step="5.0" value="-120.0" class="slider" id="lightAlpha">
+                    <span id="outputValue">Light Alpha: <span id="alpha"></span></span>
+                </div>
+                <div class="slidecontainer">
+                    <input type="range" min="-30.0" max="210.0" step="5.0" value="90.0" class="slider" id="lightBeta">
+                    <span id="outputValue">Light Beta: <span id="beta"></span></span>
+                </div>
+            </span>
+            <span id="point-spot">
+                <div class="slidecontainer">
+                    <input type="range" min="-60.0" max="60.0" step="1.0" value="0.0" class="slider" id="pointX">
+                    <span id="outputValue">Point X: <span id="posX"></span></span>
+                </div>
+                <div class="slidecontainer">
+                    <input type="range" min="0.0" max="180.0" step="1.0" value="90.0" class="slider" id="pointY">
+                    <span id="outputValue">Point Y: <span id="posY"></span></span>
+                </div>
+                <div class="slidecontainer">
+                    <input type="range" min="0.0" max="180.0" step="0.1" value="90.0" class="slider" id="pointZ">
+                    <span id="outputValue">Point Z: <span id="posZ"></span></span>
+                </div>
+                <div class="slidecontainer">
+                    <input type="range" min="0.0" max="2.0" step="1.0" value="0.0" class="slider" id="decay">
+                    <span id="outputValue">Decay: <span id="decayValue"></span></span>
+                </div>
+                <div class="slidecontainer">
+                    <input type="range" min="0.0" max="200.0" step="1.0" value="100.0" class="slider" id="targetDist">
+                    <span id="outputValue">Target Distance: <span id="distValue"></span></span>
+                </div>
+            </span>
+            <span id="specularShine">
+                <div class="slidecontainer">
+                    <input type="range" min="1.0" max="150.0" step="1.0" value="20.0" class="slider" id="specShine">
+                    <span id="outputValue">Specular Shine: <span id="specValue"></span></span>
+                </div>
+            </span>
+            <center>
+                <input type="color" id="colorChange" value="#ffffff" onChange="changeColor(this.value);">
+                <label for="colorChange">Light Color</label>
+                <input type="color" id="specularChange" value="#ffffff" onChange="changeColorS(this.value);">
+                <label for="specularChange">Specular Color</label>
+                <br>
+                <span id="ambientSpan">
+                    <input type="color" id="ambientChange" value="#666666" onChange="changeColorA(this.value);">
+                    <label for="ambientChange">Ambient</label>
+                </span>
+                <span id="hemisphericSpan">
+                    <input type="color" id="hemiUpChange" value="#cccccc" onChange="changeColorHU(this.value);">
+                    <label for="hemiUpChange">Hemispheric U</label>
+                    <input type="color" id="hemiDownChange" value="#191919" onChange="changeColorHD(this.value);">
+                    <label for="hemiDOwnChange">Hemispheric D</label>
+                </span>
+            </center>
+            <script>
+                function changeColor(value){
+                    directionalLightColorD = valCol(value.substr(1, 6)).slice(0,3);
+                    window.cancelAnimationFrame(reqId);
+                    window.onload = init();
+                }
+                function changeColorS(value){
+                    specularColorD = valCol(value.substr(1, 6));
+                    window.cancelAnimationFrame(reqId);
+                    window.onload = init();
+                }
+                function changeColorA(value){
+                    ambientColorD = valCol(value.substr(1, 6)).slice(0,3);
+                    window.cancelAnimationFrame(reqId);
+                    window.onload = init();
+                }
+                function changeColorHU(value){
+                    hemisphericUpColorD = valCol(value.substr(1, 6)).slice(0,3);
+                    window.cancelAnimationFrame(reqId);
+                    window.onload = init();
+                }
+                function changeColorHD(value){
+                    hemisphericDownColorD = valCol(value.substr(1, 6)).slice(0,3);
+                    window.cancelAnimationFrame(reqId);
+                    window.onload = init();
+                }
+            </script>
+            <center><br>
+                <table id="keys-table" border="1">
+                    <tr>
+                        <td>Elevation C: <B>W</B></td>
+                        <td>Elevation C: <B>S</B></td>
+                        <td>Translate WY: <B>I</B></td>
+                        <td>Translate WY: <B>K</B></td>
+                    </tr>
+                    <tr>
+                        <td>Angle C: <B>A</B></td>
+                        <td>Angle C: <B>D</B></td>
+                        <td>Translate WZ: <B>J</B></td>
+                        <td>Translate WZ: <B>L</B></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>Rotate WZ: <B>Up</B></td>
+                        <td>&nbsp;</td>
+                        <td>Rotate WY: <b>X</b></td>
+                    </tr>
+                    <tr>
+                        <td>Rotate WX: <B>Left</B></td>
+                        <td>Rotate WZ: <B>Down</B></td>
+                        <td>Rotate WX: <B>Right</B></td>
+                        <td>Rotate WY: <b>Z</b></td>
+                    </tr>
+                </table>
+            </center>
+            <center>
+                <br>
+                <audio id="myAudio">
+                    <source src="audio/clock-ticking.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <button style="background-color:grey; color: white;" onclick="playAudio()" type="button">Play Audio</button>
+                <button style="background-color: grey; color: white;" onclick="pauseAudio()" type="button">Pause Audio</button> 
+                <button style="background-color: white; color: black;" onClick="window.location.reload();">Reload Page</button>
+
+
+                <script>
+                    var ms = new Date().getMilliseconds();
+                    var x = document.getElementById("myAudio"); 
+
+                    function playAudio() { 
+                        x.loop = true;
+                        x.play();
+                    } 
+
+                    function pauseAudio() {
+                        x.loop = false;
+                        x.pause(); 
+                    } 
+                </script></center>
+            </td>
+            </tr>
+        </table>	
+        <script>
+            var slider = document.getElementById("fovSlider");
+            var sliderAlpha = document.getElementById("lightAlpha");
+            var sliderBeta = document.getElementById("lightBeta");
+            var sliderX = document.getElementById("pointX");
+            var sliderY = document.getElementById("pointY");
+            var sliderZ = document.getElementById("pointZ");
+            var sliderDecay = document.getElementById("decay");
+            var sliderDist = document.getElementById("targetDist");
+            var sliderSpec = document.getElementById("specShine");
+            var output = document.getElementById("fovOutput");
+            var outputAlpha = document.getElementById("alpha");
+            var outputBeta = document.getElementById("beta");
+            var outputX = document.getElementById("posX");
+            var outputY = document.getElementById("posY");
+            var outputZ = document.getElementById("posZ");
+            var outputDecay = document.getElementById("decayValue");
+            var outputDist = document.getElementById("distValue");
+            var outputSpec = document.getElementById("specValue");
+            output.innerHTML = slider.value;
+            outputAlpha.innerHTML = sliderAlpha.value;
+            outputBeta.innerHTML = sliderBeta.value;
+            outputX.innerHTML = sliderX.value;
+            outputY.innerHTML = sliderY.value;
+            outputZ.innerHTML = sliderZ.value;
+            outputDecay.innerHTML = sliderDecay.value;
+            outputDist.innerHTML = sliderDist.value;
+            outputSpec.innerHTML = sliderSpec.value;
+
+            slider.oninput = function() {
+                output.innerHTML = this.value;
+            }
+            sliderAlpha.oninput = function() {
+                outputAlpha.innerHTML = this.value;
+            }
+            sliderBeta.oninput = function() {
+                outputBeta.innerHTML = this.value;
+            }
+            sliderX.oninput = function() {
+                outputX.innerHTML = this.value;
+            }
+            sliderY.oninput = function() {
+                outputY.innerHTML = this.value;
+            }
+            sliderZ.oninput = function() {
+                outputZ.innerHTML = this.value;
+            }
+            sliderDecay.oninput = function() {
+                outputDecay.innerHTML = this.value;
+            }
+            sliderDist.oninput = function() {
+                outputDist.innerHTML = this.value;
+            }
+            sliderSpec.oninput = function() {
+                outputSpec.innerHTML = this.value;
+            }
+        </script>
+    </body>
+
+</html>
